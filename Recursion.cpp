@@ -13,14 +13,12 @@ using namespace std;
 
 int FactorialByRecursion::CalculateFactorial(int num) 
 {
-
 	if (num <= 1){
 		return 1;
 	}
 	else{
 		return num * CalculateFactorial(num - 1);
 	}
-
 }
 
 
@@ -31,43 +29,49 @@ int FactorialByStack::CalculateFactorial(int num) {
 	if (num <= 1){
 		return 1;
 	}
-
 	while (num > 1){
 		s.push(num);
 		num--;
 	}
-
 	while (!s.empty()){
 		answer = answer * s.top();
 		s.pop();
 	}
-
 	return answer;
 }
+
+//Chess Game Functions
+
 QueenPosition::QueenPosition(int r, int c){ row = r; col = c;}
 
-int QueenPosition::getRow() { return row; }
+int QueenPosition::getRow() { 
+	return row; 
+	}
+int QueenPosition::getCol() { 
+	return col; 
+	}
+std::stack<QueenPosition*> *ChessBoard::getStack() { 
+	return m_stack; 
+	}
+int ChessBoard::getFilled() { 
+	return m_filled; 
+	}
+void ChessBoard::setFilled(int filled) { 
+	m_filled = filled; 
+	}
 
-int QueenPosition::getCol() { return col; }
 
-std::stack<QueenPosition*> *ChessBoard::getStack() { return m_stack; }
-
-int ChessBoard::getFilled() { return m_filled; }
-
-void ChessBoard::setFilled(int filled) { m_filled = filled; }
-
+//Game Solving Functions
 bool ChessBoard::Solve(ChessBoard chessBoard, int col) {
 
 	bool done = false;
 	std::stack<QueenPosition*> *stack = chessBoard.getStack();
 	int b_row = 0;
 	int failed = false;
-	while(!done)
-	{
+	while(!done){
 		// for loop rows
 		failed = true;
-		for (int row=b_row; row<8; row++)
-		{
+		for (int row=b_row; row<8; row++){
 			// if safe 
 			if (CheckSafeQueens(chessBoard, row, col))
 			{
@@ -81,24 +85,20 @@ bool ChessBoard::Solve(ChessBoard chessBoard, int col) {
 		}
 
 		// couldn't place queen
-		if (stack->size() == 8)
-		{
+		if (stack->size() == 8){
 			// won
 			done = true;
 		}
-		else if (failed)
-		{
+		else if (failed){
 			b_row = stack->top()->getRow() + 1;
 			stack->pop();
 			col--;
 		}
-		else
-		{
+		else{
 			// could place queen
 			b_row = 0;
 			continue;
 		}
-
 	}
 	return true;
 }
@@ -110,13 +110,11 @@ int i, j;
 	std::stack<QueenPosition*> cpy = *stack;
 	int size = stack->size(); 
  
-    /* Check this row on left side */
+    // Check this row on left side 
 	cpy = *stack;
 	count = 0;
-	while (count < size)
-	{
-		for (i = 0; i <= col; i++) 
-		{
+	while (count < size){
+		for (i = 0; i <= col; i++) {
 			if (cpy.empty())
 				continue;
 
@@ -131,27 +129,16 @@ int i, j;
 		cpy.pop();
 	}
 
-    /* Check upper diagonal on left side */
+    // Check upper diagonal on left side 
 	cpy = *stack;
 	count = 0;
-	while (count < size)
-	{
-		for (i = row, j = col; i >= 0 && j >= 0; i--, j--) 
-		{
-			if (cpy.empty())
-				continue;
-			
-			if ( (cpy.top()->getCol() == j) &&
-				(cpy.top()->getRow() == i) )
-			{
+	while (count < size){
+		for (i = row, j = col; i >= 0 && j >= 0; i--, j--) {
+			if (cpy.empty()){
+				continue;}
+			if ( (cpy.top()->getCol() == j) &&(cpy.top()->getRow() == i) ){
 				return false;
 			}
-
-			/*if (chessBoard->m_board[i][j]) 
-			{
-				return false; 
-			}
-			*/
 		}
 		if (cpy.empty())
 			break;
@@ -159,37 +146,25 @@ int i, j;
 		cpy.pop();
 	}	
 
-    /* Check lower diagonal on left side */
+    // Check lower diagonal on left side 
 	cpy = *stack;
 	count = 0;
-	while (count < size)
-	{
-		for (i = row, j = col; j >= 0 && i < 8; i++, j--)
-		{
+	while (count < size){
+		for (i = row, j = col; j >= 0 && i < 8; i++, j--){
 			if (cpy.empty())
 				continue;
 
 			if ( (cpy.top()->getCol() == j) &&
-				(cpy.top()->getRow() == i) )
-			{
+				(cpy.top()->getRow() == i) ){
 				return false;
 			}
-
-			/*if (chessBoard->m_board[i][j]) 
-			{
-				return false; 
-			}
-			*/
 		}
 		if (cpy.empty())
 			break;
 		count++;
 		cpy.pop();
-	}
-	
+	}	
 	return true; 
-
-    // TODO
 }
 
 
@@ -285,3 +260,4 @@ char const* MyException2::what() const throw() {
 char const* MyException3::what() const throw(){
 	return "MyException3";
 }
+
