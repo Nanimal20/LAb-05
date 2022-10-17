@@ -31,6 +31,17 @@ private:
 	std::stack <int> s;
 };
 
+class QueenPosition
+{
+public:
+	QueenPosition(int r, int c);
+	void setCoords(int row, int col);
+	int getRow();
+	int getCol();
+private:
+	int row;
+	int col;
+};
 
 class  MyFakeClass
 {
@@ -62,7 +73,12 @@ public:
 	virtual char const* what() const throw();
 };
 
-// TODO make a MyException3
+class  MyException3 : MyBaseException
+{
+public:
+	
+	virtual char const* what() const throw();
+};
 
 
 extern  std::string CallSimpleExceptionMethod(int i);
@@ -81,6 +97,8 @@ public:
 				m_board[i][j] = 0;
 			}
 		}
+	m_stack = new std::stack<QueenPosition*>;
+	m_filled = 0;
 	}
 
 	ChessBoard(const ChessBoard &c)
@@ -92,11 +110,17 @@ public:
 				m_board[i][j] = c.m_board[i][j];
 			}
 		}
+	m_stack = new std::stack<QueenPosition*>;
+	m_filled = 0;
 	}
 
 	std::string ToString();
 	
 	bool Solve(ChessBoard chessboard, int col);
+	auto getBoard(); // TODO
+	std::stack<QueenPosition*> *getStack();	
+	int getFilled();
+	void setFilled(int filled);
 
 	
 
@@ -104,4 +128,8 @@ private:
     bool CheckSafeQueens(ChessBoard chessBoard, int i, int col);
 	int m_board[8][8]; //zero is free, while 1 is a placed queen
 	// TODO: add your methods here.
+	bool checkQueenPosition(QueenPosition *pos);
+
+	std::stack<QueenPosition*> *m_stack;
+	int m_filled;
 };

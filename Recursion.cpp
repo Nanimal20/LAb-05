@@ -44,37 +44,150 @@ int FactorialByStack::CalculateFactorial(int num) {
 
 	return answer;
 }
+QueenPosition::QueenPosition(int r, int c){ row = r; col = c;}
+
+int QueenPosition::getRow() { return row; }
+
+int QueenPosition::getCol() { return col; }
+
+std::stack<QueenPosition*> *ChessBoard::getStack() { return m_stack; }
+
+int ChessBoard::getFilled() { return m_filled; }
+
+void ChessBoard::setFilled(int filled) { m_filled = filled; }
 
 bool ChessBoard::Solve(ChessBoard chessBoard, int col) {
 
-	if (col >= 8) {
-		return true;
-	}
-
-
-	for (int i = 0; i < 8; ++i) {
-
-		if (CheckSafeQueens(chessBoard, i, col)) 
+	bool done = false;
+	std::stack<QueenPosition*> *stack = chessBoard.getStack();
+	int b_row = 0;
+	int failed = false;
+	while(!done)
+	{
+		// for loop rows
+		failed = true;
+		for (int row=b_row; row<8; row++)
 		{
-			m_board[i][col] = 1;
-
-			if (Solve(chessBoard, col + 1) == true)
+			// if safe 
+			if (CheckSafeQueens(chessBoard, row, col))
 			{
-				return true;
+				QueenPosition *qp = new QueenPosition(row, col);
+				stack->push(qp);
+				// update cols
+				col++;
+				failed = false;
+				break;
 			}
-
-			m_board[i][col] = 0;
-
 		}
+
+		// couldn't place queen
+		if (stack->size() == 8)
+		{
+			// won
+			done = true;
+		}
+		else if (failed)
+		{
+			b_row = stack->top()->getRow() + 1;
+			stack->pop();
+			col--;
+		}
+		else
+		{
+			// could place queen
+			b_row = 0;
+			continue;
+		}
+
 	}
-	return false;
+	return true;
 }
 
+bool ChessBoard::CheckSafeQueens(ChessBoard chessBoard, int row, int col) {
+int i, j; 
+	int count = 0;
+	std::stack<QueenPosition*> *stack = getStack();
+	std::stack<QueenPosition*> cpy = *stack;
+	int size = stack->size(); 
+ 
+    /* Check this row on left side */
+	cpy = *stack;
+	count = 0;
+	while (count < size)
+	{
+		for (i = 0; i <= col; i++) 
+		{
+			if (cpy.empty())
+				continue;
 
-bool ChessBoard::CheckSafeQueens(ChessBoard chessBoard, int row, int col) 
-{
+			else if ( (cpy.top()->getCol() == i) &&
+				(cpy.top()->getRow() == row) ){
+				return false;
+			}
+		}
+		if (cpy.empty()){
+			break;}
+		count++;
+		cpy.pop();
+	}
 
-    return false;
+    /* Check upper diagonal on left side */
+	cpy = *stack;
+	count = 0;
+	while (count < size)
+	{
+		for (i = row, j = col; i >= 0 && j >= 0; i--, j--) 
+		{
+			if (cpy.empty())
+				continue;
+			
+			if ( (cpy.top()->getCol() == j) &&
+				(cpy.top()->getRow() == i) )
+			{
+				return false;
+			}
+
+			/*if (chessBoard->m_board[i][j]) 
+			{
+				return false; 
+			}
+			*/
+		}
+		if (cpy.empty())
+			break;
+		count++;
+		cpy.pop();
+	}	
+
+    /* Check lower diagonal on left side */
+	cpy = *stack;
+	count = 0;
+	while (count < size)
+	{
+		for (i = row, j = col; j >= 0 && i < 8; i++, j--)
+		{
+			if (cpy.empty())
+				continue;
+
+			if ( (cpy.top()->getCol() == j) &&
+				(cpy.top()->getRow() == i) )
+			{
+				return false;
+			}
+
+			/*if (chessBoard->m_board[i][j]) 
+			{
+				return false; 
+			}
+			*/
+		}
+		if (cpy.empty())
+			break;
+		count++;
+		cpy.pop();
+	}
+	
+	return true; 
 
     // TODO
 }
@@ -83,15 +196,22 @@ bool ChessBoard::CheckSafeQueens(ChessBoard chessBoard, int row, int col)
 string ChessBoard::ToString() {
 
 	string answer = "";
-	for (int i = 0; i < 8; ++i) {
-		for (int j = 0; j < 8; ++j) {
-			int temp = m_board[i][j];
+	std::stack<QueenPosition*> *stack = getStack();
+	int temp = 0;
+	for (int i = 7; i >= 0; i--) {
+		for (int j = 7; j >= 0; j--) {
+			temp = ( (stack->top()->getCol() == i) &&
+					(stack->top()->getRow() == j) ) ? 1 : 0;
+			
+			if (temp){
+				stack->pop();
+			}
 			stringstream ss;
 			ss << temp;
 			string str = ss.str();
-			answer = answer + str;
+			answer += str;
 		}
-		answer = answer + "\n";
+		answer += "\n";
 	}
 	return answer;
 }
@@ -106,51 +226,52 @@ extern std::string CallSimpleExceptionMethod(int i)
     // And also return a string of the exception recieved
     // The tests will tell you what to string to return.
 
-
-	std::string retVal;
+	std::string retVal = "";
 	MyFakeClass* resourceThatNeedsToBeCleanedup = nullptr;
-	
-	// These lines in try catch block \/\/\/\/\/
-
 	resourceThatNeedsToBeCleanedup = new MyFakeClass();
-	SimpleExceptionMethod(i);
+	try{
+		SimpleExceptionMethod(i);
+	} 
+	catch (MyException1 &e) {
+		retVal = "I got Exception 1";
+	} 
+	catch (MyException2 &e) {
+		retVal = "I got Exception 2";
+	} 
+	catch (MyException3 &e) {
+		retVal = "I got Exception 3";
+	}
 
-	//These lines in try catch block ^^^^^
-
+	if (retVal.empty()){
+		retVal = "I did not get an Exception";
+	}
 	delete resourceThatNeedsToBeCleanedup;
-
 	return retVal;
 }
+
 
 // NOTE this function should not be editted.
 extern void SimpleExceptionMethod(int i)
 {
 	int retVal = 0;
 
-	if (i == 1)
-	{
+	if (i == 1){
 		throw MyException1();
 	}
-	else if (i == 2)
-	{
+	else if (i == 2){
 		throw MyException2();
-
 	}
-	else if (i == 3)
-	{
+	else if (i == 3){
         // TODO uncomment line below, as you need to have all three exceptions working here
-		//throw MyException3();
+		throw MyException3();
 	}
-	else
-	{
+	else{
 		retVal = 20;
 	}
-
 	return;
-
 }
 
-
+//Exceptions
 
 char const* MyBaseException::what() const throw() {
 	return "MyBaseException";
@@ -161,4 +282,6 @@ char const* MyException1::what() const throw() {
 char const* MyException2::what() const throw() {
 	return "MyException2";
 }
-// TODO make a MyException3::what
+char const* MyException3::what() const throw(){
+	return "MyException3";
+}
